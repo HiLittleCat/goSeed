@@ -21,7 +21,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	logFile, err := os.OpenFile("log/log.txt", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0642)
+	logFile, err := os.OpenFile("log/service.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0642)
 	defer logFile.Close()
 	log.SetOutput(logFile)
 

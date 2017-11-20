@@ -1,9 +1,5 @@
 package conn
 
-const (
-	MgoBosh = "bosh"
-)
-
 func init() {
 	mgoPools = make(map[string]MgoPool)
 }

@@ -1,9 +1,5 @@
 package conn
 
-const (
-	RedisBosh = "bosh"
-)
-
 func init() {
 	redisPools = make(map[string]RedisPool)
 }

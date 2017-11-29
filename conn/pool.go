@@ -9,6 +9,7 @@ type Conn interface{}
 type ConnPool interface {
 	Get() Conn
 	Put(Conn)
+	Exec(...interface{})
 }
 
 type pool struct {

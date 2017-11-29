@@ -64,7 +64,7 @@ func (p *RedisPool) Put(c Conn) {
 }
 
 // 使用连接池
-func (self *RedisPool) Exec(callback func(*redis.Client)) {
+func (self *RedisPool) Exec(db int8, callback func(*redis.Client)) {
 	client := self.Get().(*redis.Client)
 	defer func() {
 		self.Put(client)

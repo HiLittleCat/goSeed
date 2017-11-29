@@ -19,8 +19,7 @@ type User struct {
 }
 
 func (user *User) Get() (err error) {
-	pool := conn.GetMgoPool(conn.MgoBosh)
-	pool.Exec(collectionName, func(c *mgo.Collection) {
+	conn.GetMgoPool(conn.MgoBosh).Exec(collectionName, func(c *mgo.Collection) {
 		err = c.Find(bson.M{
 			"_id": bson.ObjectIdHex(user.Id),
 		}).Select(bson.M{

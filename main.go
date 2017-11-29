@@ -5,15 +5,17 @@ import (
 	"common/conn"
 	"common/controller"
 	"common/middleware"
-	"core"
 	"os"
+	"runtime"
+
+	"github.com/HiLittleCat/core"
 
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-
-	//runtime.GOMAXPROCS(4)
+	//本函数将在调度程序优化后会去掉。
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// Parse config.ini
 	if err := config.New("config/config.ini"); err != nil {
@@ -47,7 +49,6 @@ func main() {
 		Host:     config.Default.Redis.Host,
 		Password: config.Default.Redis.Password,
 		Size:     config.Default.Redis.PoolSize,
-		DB:       config.Default.Redis.DB,
 	}
 	redisPool, err := conn.NewRedisPool(redisOption)
 	if err != nil {

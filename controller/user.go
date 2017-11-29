@@ -2,7 +2,8 @@ package controller
 
 import (
 	"common/model"
-	"core"
+
+	"github.com/HiLittleCat/core"
 
 	"net/http"
 

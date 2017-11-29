@@ -1,9 +1,11 @@
 package middleware
 
 import (
+	"common/config"
 	"common/conn"
-	"core"
 	"time"
+
+	"github.com/HiLittleCat/core"
 
 	log "github.com/sirupsen/logrus"
 
@@ -19,13 +21,16 @@ func Container(ctx *core.Context) {
 			panic(err)
 		}
 	}
-	log.Infoln(" %s  %s  %s", ctx.Request.Method, ctx.Request.URL, time.Since(start))
+	t := time.Since(start)
+	if t >= config.Default.Base.SlowResMS {
+		log.Infoln(" %s  %s  %s", ctx.Request.Method, ctx.Request.URL, time.Since(start))
+	}
 }
 
 //set session info
 func Session(ctx *core.Context) {
 	redisPool := conn.GetRedisPool(conn.RedisBosh)
-	redisPool.Exec(func(c *redis.Client) {
+	redisPool.Exec(conn.SessionDB, func(c *redis.Client) {
 		cmd := c.Get("session:")
 		if err := cmd.Err(); err != nil {
 			//TODO LOG

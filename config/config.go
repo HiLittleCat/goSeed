@@ -1,6 +1,10 @@
 package config
 
-import "github.com/BurntSushi/toml"
+import (
+	"time"
+
+	"github.com/BurntSushi/toml"
+)
 
 var Default Config
 
@@ -12,7 +16,8 @@ type Config struct {
 
 // 基础配置
 type base struct {
-	Address string
+	Address   string
+	SlowResMS time.Duration
 }
 
 // MongoDB 配置
@@ -27,7 +32,6 @@ type mongodb struct {
 type redis struct {
 	Host     string
 	Password string
-	DB       int
 	PoolSize int
 }
 

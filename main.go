@@ -14,6 +14,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+func PathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
+}
+
 func main() {
 	//本函数将在调度程序优化后会去掉。
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -24,6 +35,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	if b, _ := PathExists("log"); b == false {
+		os.Mkdir("log", 0777)
+	}
 	logFile, err := os.OpenFile("log/service.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0642)
 	defer logFile.Close()
 	log.SetOutput(logFile)

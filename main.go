@@ -1,12 +1,13 @@
 package main
 
 import (
-	"common/config"
-	"common/conn"
-	"common/controller"
-	"common/middleware"
 	"os"
 	"runtime"
+
+	"github.com/HiLittleCat/goSeed/config"
+	"github.com/HiLittleCat/goSeed/conn"
+	"github.com/HiLittleCat/goSeed/controller"
+	"github.com/HiLittleCat/goSeed/middleware"
 
 	"github.com/HiLittleCat/core"
 
@@ -62,7 +63,7 @@ func main() {
 	core.Use(middleware.Session)
 
 	// Controller register
-	core.AutoController(&controller.UserController{})
+	core.AutoController(&controller.User{})
 
 	core.Address = config.Default.Base.Address
 	// Run server

@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"common/model"
+	"github.com/HiLittleCat/goSeed/model"
 
 	"github.com/HiLittleCat/core"
 
@@ -10,11 +10,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type UserController struct {
+type User struct {
 	core.Controller
 }
 
-func (this *UserController) Get() interface{} {
+func (this *User) Get() interface{} {
 	user := model.User{Id: this.Ctx.QueryParam("_id")}
 	if err := user.Get(); err != nil {
 		log.WithFields(log.Fields{"err": err}).Warnln("UserController.Get error")

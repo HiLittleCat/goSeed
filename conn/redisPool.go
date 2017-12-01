@@ -1,6 +1,10 @@
 package conn
 
 import (
+	"time"
+
+	"github.com/HiLittleCat/goSeed/config"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/redis.v5"
 )
 
@@ -65,11 +69,16 @@ func (p *RedisPool) Put(c Conn) {
 
 // 使用连接池
 func (self *RedisPool) Exec(db int8, callback func(*redis.Client)) {
+	start := time.Now()
 	client := self.Get().(*redis.Client)
 	defer func() {
 		self.Put(client)
 		if err := recover(); err != nil {
 			panic(err)
+		}
+		t := time.Since(start)
+		if t >= config.Default.Redis.SlowRes {
+			log.Infoln("redis exec db:", db, t)
 		}
 	}()
 	callback(client)

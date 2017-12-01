@@ -1,9 +1,11 @@
 package middleware
 
 import (
-	"common/config"
-	"common/conn"
 	"time"
+
+	"github.com/HiLittleCat/goSeed/conn"
+
+	"github.com/HiLittleCat/goSeed/config"
 
 	"github.com/HiLittleCat/core"
 
@@ -22,8 +24,8 @@ func Container(ctx *core.Context) {
 		}
 	}
 	t := time.Since(start)
-	if t >= config.Default.Base.SlowResMS {
-		log.Infoln(" %s  %s  %s", ctx.Request.Method, ctx.Request.URL, time.Since(start))
+	if t >= config.Default.Base.SlowRes {
+		log.Infoln(ctx.Request.Method, ctx.Request.URL, t)
 	}
 }
 

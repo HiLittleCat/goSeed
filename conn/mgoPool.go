@@ -1,6 +1,10 @@
 package conn
 
 import (
+	"time"
+
+	"github.com/HiLittleCat/goSeed/config"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/mgo.v2"
 )
 
@@ -54,11 +58,16 @@ func (p *MgoPool) Put(c Conn) {
 
 // 使用连接池
 func (p *MgoPool) Exec(collection string, callback func(*mgo.Collection)) {
+	start := time.Now()
 	_session := p.Get().(*mgo.Session)
 	defer func() {
 		p.Put(_session)
 		if err := recover(); err != nil {
 			panic(err)
+		}
+		t := time.Since(start)
+		if t >= config.Default.MongoDB.SlowRes {
+			log.Infoln("mongodb exec ", collection, t)
 		}
 	}()
 	c := _session.DB(p.opt.DbName).C(collection)

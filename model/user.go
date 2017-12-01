@@ -1,7 +1,7 @@
 package model
 
 import (
-	"common/conn"
+	"github.com/HiLittleCat/goSeed/conn"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"

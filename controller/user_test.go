@@ -24,3 +24,13 @@ func TestGet(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestGetAll(t *testing.T) {
+	resp, err := http.Get(URL + "/All")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+}

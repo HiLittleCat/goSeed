@@ -30,3 +30,14 @@ func (user *User) Get() (err error) {
 	})
 	return err
 }
+
+func (user *User) GetAll() (list []User, err error) {
+	conn.GetMgoPool(conn.MgoBosh).Exec(collectionName, func(c *mgo.Collection) {
+		err = c.Find(nil).Select(bson.M{
+			"mobile": 1,
+			"name":   1,
+			"logo":   1,
+		}).All(&list)
+	})
+	return list, err
+}

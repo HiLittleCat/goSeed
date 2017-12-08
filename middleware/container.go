@@ -17,15 +17,19 @@ import (
 func Container(ctx *core.Context) {
 	start := time.Now()
 	ctx.Next()
-	if ctx.Written() == false {
-		_, err := ctx.JSON(ctx.ResData)
-		if err != nil {
-			panic(err)
-		}
-	}
 	t := time.Since(start)
 	if t >= config.Default.Base.SlowRes {
 		log.Infoln(ctx.Request.Method, ctx.Request.URL, t)
+	}
+}
+
+func ResWrite(ctx *core.Context) {
+	ctx.Next()
+	if ctx.Written() == false {
+		_, err := ctx.JSON(200, core.ResFormat{true, ctx.ResData})
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 

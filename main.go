@@ -4,13 +4,14 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/HiLittleCat/compress"
+	"github.com/HiLittleCat/core"
 	"github.com/HiLittleCat/goSeed/config"
 	"github.com/HiLittleCat/goSeed/conn"
 	"github.com/HiLittleCat/goSeed/controller"
 	"github.com/HiLittleCat/goSeed/middleware"
 
-	"github.com/HiLittleCat/core"
-
+	logcore "github.com/HiLittleCat/log"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -35,18 +36,17 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Log config
 	if b, _ := PathExists("log"); b == false {
 		os.Mkdir("log", 0777)
 	}
 	logFile, err := os.OpenFile("log/service.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0642)
 	defer logFile.Close()
 	log.SetOutput(logFile)
-
-	// Only log the warning severity or above.
-	log.SetLevel(log.DebugLevel)
+	log.SetLevel(log.WarnLevel)
 	log.SetFormatter(&log.TextFormatter{})
 
-	//mongodb init
+	// Mongodb init
 	mgoOption := conn.MgoPoolOption{
 		Host:   config.Default.MongoDB.Host,
 		Size:   config.Default.MongoDB.PoolSize,
@@ -54,12 +54,12 @@ func main() {
 	}
 	mgoPool, err := conn.NewMgoPool(mgoOption)
 	if err != nil {
-		log.WithFields(log.Fields{"err": err}).Fatalln("connect mongodb fail")
+		log.WithFields(log.Fields{"err": err}).Fatalln("connect mongodb: " + config.Default.MongoDB.DatebaseName + "  fail")
 		os.Exit(1)
 	}
 	conn.MgoSet(conn.MgoBosh, mgoPool)
 
-	// redis init
+	// Redis init
 	redisOption := conn.RedisPoolOption{
 		Host:     config.Default.Redis.Host,
 		Password: config.Default.Redis.Password,
@@ -67,13 +67,16 @@ func main() {
 	}
 	redisPool, err := conn.NewRedisPool(redisOption)
 	if err != nil {
-		log.WithFields(log.Fields{"err": err}).Fatalln("connect redis fail")
+		log.WithFields(log.Fields{"err": err}).Fatalln("connect redis:" + config.Default.Redis.Host + " fail")
 		os.Exit(1)
 	}
 	conn.RedisSet(conn.RedisBosh, redisPool)
 
 	// Middleware register
+	logcore.Use()
 	core.Use(middleware.Container)
+	compress.Use()
+	core.Use(middleware.ResWrite)
 	core.Use(middleware.Session)
 
 	// Controller register

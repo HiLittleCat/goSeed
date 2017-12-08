@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"strconv"
+
 	"github.com/HiLittleCat/goSeed/model"
 
 	"net/http"
@@ -18,25 +20,44 @@ type User struct {
 * User
  */
 
-func (ctr *User) Get() *model.User {
-	user := model.User{Id: ctr.Ctx.QueryParam("_id")}
+func (userController *User) Get() *model.User {
+	_id := userController.Ctx.QueryParam("_id")
+	if _id == "" {
+		log.Warnln("User.Get query param _id must is required.")
+		userController.Ctx.ResStatus(http.StatusBadRequest)
+		return nil
+	}
+	user := model.User{Id: _id}
 	if err := user.Get(); err != nil {
-		log.WithFields(log.Fields{"err": err}).Warnln("UserController.Get error")
-		ctr.Ctx.ResStatus(http.StatusInternalServerError)
+		log.WithFields(log.Fields{"err": err}).Warnln("User.Get error")
+		userController.Ctx.ResStatus(http.StatusInternalServerError)
 		return nil
 	}
 	return &user
 }
 
 /**
-* User/All
+* User/page
  */
-func (ctr *User) GetAll() []model.User {
+func (userController *User) GetPage() []model.User {
 	user := model.User{}
-	list, err := user.GetAll()
+	page, err := strconv.Atoi(userController.Ctx.QueryParam("page"))
 	if err != nil {
-		log.WithFields(log.Fields{"err": err}).Warnln("UserController.GetAll error")
-		ctr.Ctx.ResStatus(http.StatusInternalServerError)
+		log.WithFields(log.Fields{"err": err}).Warnln("User.GetPage query param page must be a number.")
+		userController.Ctx.ResStatus(http.StatusBadRequest)
+		return nil
+	}
+	pageCount, err := strconv.Atoi(userController.Ctx.QueryParam("pageCount"))
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Warnln("User.GetPage query param pageCount must be a number.")
+		userController.Ctx.ResStatus(http.StatusBadRequest)
+		return nil
+	}
+
+	list, err := user.GetPage(page, pageCount)
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Errorln("User.GetPage error")
+		userController.Ctx.ResStatus(http.StatusInternalServerError)
 		return nil
 	}
 	return list

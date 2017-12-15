@@ -18,6 +18,17 @@ type User struct {
 	Logo   string `bson:"logo"`
 }
 
+func (user *User) Create() (err error) {
+	conn.GetMgoPool(conn.MgoBosh).Exec(collectionName, func(c *mgo.Collection) {
+		err = c.Insert(bson.M{
+			"mobile": user.Mobile,
+			"name":   user.Name,
+			"logo":   user.Logo,
+		})
+	})
+	return err
+}
+
 func (user *User) Get() (err error) {
 	conn.GetMgoPool(conn.MgoBosh).Exec(collectionName, func(c *mgo.Collection) {
 		err = c.Find(bson.M{
@@ -31,13 +42,19 @@ func (user *User) Get() (err error) {
 	return err
 }
 
-func (user *User) GetPage(page int, pageCount int) (list []User, err error) {
+type UserList struct {
+	Page      int
+	PageCount int
+	List      []User
+}
+
+func (list *UserList) GetPage() (err error) {
 	conn.GetMgoPool(conn.MgoBosh).Exec(collectionName, func(c *mgo.Collection) {
 		err = c.Find(nil).Select(bson.M{
 			"mobile": 1,
 			"name":   1,
 			"logo":   1,
-		}).Skip((page - 1) * pageCount).Limit(pageCount).All(&list)
+		}).Skip((list.Page - 1) * list.PageCount).Limit(list.PageCount).All(&list.List)
 	})
-	return list, err
+	return err
 }

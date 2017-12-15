@@ -8,8 +8,6 @@ import (
 	"net/http"
 
 	"github.com/HiLittleCat/core"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type User struct {
@@ -17,48 +15,60 @@ type User struct {
 }
 
 /**
+ */
+func (u *User) PostCreate() {
+	mobile := u.Ctx.Request.FormValue("mobile")
+	if mobile == "" {
+		u.Ctx.Fail(http.StatusBadRequest, "User.Create post param 'mobile' is required.")
+		return
+	}
+	name := u.Ctx.Request.FormValue("name")
+	logo := u.Ctx.Request.FormValue("logo")
+	user := model.User{Mobile: mobile, Name: name, Logo: logo}
+	if err := user.Create(); err != nil {
+		u.Ctx.Fail(http.StatusInternalServerError, "User.Create error.", err)
+		return
+	}
+}
+
+/**
 * User
  */
 
-func (userController *User) Get() *model.User {
-	_id := userController.Ctx.QueryParam("_id")
+func (u *User) Get() {
+	_id := u.Ctx.Request.FormValue("_id")
+
 	if _id == "" {
-		log.Warnln("User.Get query param _id must is required.")
-		userController.Ctx.ResStatus(http.StatusBadRequest)
-		return nil
+		u.Ctx.Fail(http.StatusBadRequest, "User.Get query param '_id' is required.")
+		return
 	}
 	user := model.User{Id: _id}
 	if err := user.Get(); err != nil {
-		log.WithFields(log.Fields{"err": err}).Warnln("User.Get error")
-		userController.Ctx.ResStatus(http.StatusInternalServerError)
-		return nil
+		u.Ctx.Fail(http.StatusInternalServerError, "User.Get err.", err)
+		return
 	}
-	return &user
+	u.Ctx.Success(http.StatusOK, user)
 }
 
 /**
 * User/page
  */
-func (userController *User) GetPage() []model.User {
-	user := model.User{}
-	page, err := strconv.Atoi(userController.Ctx.QueryParam("page"))
+func (u *User) GetPage() {
+	page, err := strconv.Atoi(u.Ctx.Request.FormValue("page"))
 	if err != nil {
-		log.WithFields(log.Fields{"err": err}).Warnln("User.GetPage query param page must be a number.")
-		userController.Ctx.ResStatus(http.StatusBadRequest)
-		return nil
+		u.Ctx.Fail(http.StatusBadRequest, "User.GetPage query param 'page' must be a number.")
+		return
 	}
-	pageCount, err := strconv.Atoi(userController.Ctx.QueryParam("pageCount"))
+	pageCount, err := strconv.Atoi(u.Ctx.Request.FormValue("pageCount"))
 	if err != nil {
-		log.WithFields(log.Fields{"err": err}).Warnln("User.GetPage query param pageCount must be a number.")
-		userController.Ctx.ResStatus(http.StatusBadRequest)
-		return nil
+		u.Ctx.Fail(http.StatusBadRequest, "User.GetPage query param 'pageCount' must be a number.")
+		return
 	}
-
-	list, err := user.GetPage(page, pageCount)
+	list := model.UserList{Page: page, PageCount: pageCount}
+	err = list.GetPage()
 	if err != nil {
-		log.WithFields(log.Fields{"err": err}).Errorln("User.GetPage error")
-		userController.Ctx.ResStatus(http.StatusInternalServerError)
-		return nil
+		u.Ctx.Fail(http.StatusInternalServerError, "User.GetPage fail to get list.", err)
+		return
 	}
-	return list
+	u.Ctx.Success(http.StatusOK, list)
 }

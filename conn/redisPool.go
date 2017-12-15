@@ -74,11 +74,12 @@ func (self *RedisPool) Exec(db int8, callback func(*redis.Client)) {
 	defer func() {
 		self.Put(client)
 		if err := recover(); err != nil {
+			log.Errorln("redis exec err, ", err)
 			panic(err)
 		}
 		t := time.Since(start)
 		if t >= config.Default.Redis.SlowRes {
-			log.Infoln("redis exec db:", db, t)
+			log.Warnln("redis exec db:", db, t)
 		}
 	}()
 	callback(client)

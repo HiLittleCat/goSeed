@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/HiLittleCat/goSeed/conn"
@@ -26,7 +27,7 @@ func Container(ctx *core.Context) {
 func ResWrite(ctx *core.Context) {
 	ctx.Next()
 	if ctx.Written() == false {
-		_, err := ctx.JSON(200, core.ResFormat{true, ctx.ResData})
+		_, err := ctx.Success(http.StatusOK, ctx.ResData)
 		if err != nil {
 			panic(err)
 		}
@@ -37,12 +38,13 @@ func ResWrite(ctx *core.Context) {
 func Session(ctx *core.Context) {
 	redisPool := conn.GetRedisPool(conn.RedisBosh)
 	redisPool.Exec(conn.SessionDB, func(c *redis.Client) {
-		cmd := c.Get("session:")
-		if err := cmd.Err(); err != nil {
-			//TODO LOG
-		}
-		//ctx.Session = make(map[string]interface{})
-		//ctx.Session["UserAgent"] = ctx.Request.UserAgent
+		// cmd := c.Get("session:")
+		// if err := cmd.Err(); err != nil {
+		// 	log.WithFields(log.Fields{"err": err}).Warn("get session fail")
+		// }
+		// cmd.Result()
+		// ctx.Session = make(map[string]interface{})
+		// ctx.Session["user"] = ctx.Request.UserAgent
 	})
 	ctx.Next()
 }

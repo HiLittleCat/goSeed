@@ -63,11 +63,12 @@ func (p *MgoPool) Exec(collection string, callback func(*mgo.Collection)) {
 	defer func() {
 		p.Put(_session)
 		if err := recover(); err != nil {
+			log.Errorln("mongodb exec err, ", err)
 			panic(err)
 		}
 		t := time.Since(start)
 		if t >= config.Default.MongoDB.SlowRes {
-			log.Infoln("mongodb exec ", collection, t)
+			log.Warnln("mongodb exec ", collection, t)
 		}
 	}()
 	c := _session.DB(p.opt.DbName).C(collection)

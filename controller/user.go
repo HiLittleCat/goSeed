@@ -26,7 +26,7 @@ func (u *User) PostCreate() (string, error) {
 // Get User
 func (u *User) Get() (*model.User, error) {
 	_id := u.ParamLength("_id", 24)
-	user := model.User{Id: _id}
+	user := model.User{ID: _id}
 	if err := user.Get(); err != nil {
 		return nil, err
 	}

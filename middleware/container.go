@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/HiLittleCat/goSeed/conn"
@@ -24,16 +23,6 @@ func Container(ctx *core.Context) {
 	}
 }
 
-func ResWrite(ctx *core.Context) {
-	ctx.Next()
-	if ctx.Written() == false {
-		_, err := ctx.Success(http.StatusOK, ctx.ResData)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
-
 //set session info
 func Session(ctx *core.Context) {
 	redisPool := conn.GetRedisPool(conn.RedisBosh)
@@ -43,8 +32,6 @@ func Session(ctx *core.Context) {
 		// 	log.WithFields(log.Fields{"err": err}).Warn("get session fail")
 		// }
 		// cmd.Result()
-		// ctx.Session = make(map[string]interface{})
-		// ctx.Session["user"] = ctx.Request.UserAgent
 	})
 	ctx.Next()
 }

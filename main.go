@@ -76,10 +76,11 @@ func main() {
 	logcore.Use()
 	core.Use(middleware.Container)
 	compress.Use()
-	core.Use(middleware.ResWrite)
+	//core.Use(middleware.ResWrite)
 	core.Use(middleware.Session)
 
 	// Controller register
+	core.Use(core.AutoRouter)
 	core.AutoController(&controller.User{})
 
 	core.Address = config.Default.Base.Address

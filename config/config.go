@@ -16,8 +16,12 @@ type Config struct {
 
 // 基础配置
 type base struct {
-	Address string
-	SlowRes time.Duration
+	Address      string
+	SlowRes      time.Duration
+	WriteTimeout time.Duration
+	ReadTimeout  time.Duration
+	ListenLimit  int
+	Production   bool
 }
 
 // MongoDB 配置
@@ -43,7 +47,10 @@ func New(fileName string) error {
 		return err
 	}
 	Default.Base.SlowRes = Default.Base.SlowRes * 1000 * 1000
+	Default.Base.WriteTimeout = Default.Base.WriteTimeout * 1000 * 1000
+	Default.Base.ReadTimeout = Default.Base.ReadTimeout * 1000 * 1000
 	Default.MongoDB.SlowRes = Default.MongoDB.SlowRes * 1000 * 1000
 	Default.Redis.SlowRes = Default.Redis.SlowRes * 1000 * 1000
+
 	return nil
 }

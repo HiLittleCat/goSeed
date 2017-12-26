@@ -72,6 +72,13 @@ func main() {
 	}
 	conn.RedisSet(conn.RedisBosh, redisPool)
 
+	// Core set
+	core.Address = config.Default.Base.Address
+	core.WriteTimeout = config.Default.Base.WriteTimeout
+	core.ReadTimeout = config.Default.Base.ReadTimeout
+	core.ListenLimit = config.Default.Base.ListenLimit
+	core.Production = config.Default.Base.Production
+
 	// Middleware register
 	logcore.Use()
 	core.Use(middleware.Container)
@@ -83,7 +90,6 @@ func main() {
 	core.Use(core.AutoRouter)
 	core.AutoController(&controller.User{})
 
-	core.Address = config.Default.Base.Address
 	// Run server
 	core.Run()
 }

@@ -36,7 +36,7 @@ func (u *User) Get() (*model.User, error) {
 // GetPage User/page
 func (u *User) GetPage() (*model.UserList, error) {
 	page := u.ParamMin("page", 1)
-	pageCount := u.ParamMin("pageCount", 10)
+	pageCount := u.ParamRange("pageCount", 10, 20)
 	list := model.UserList{Page: page, PageCount: pageCount}
 	err := list.GetPage()
 	if err != nil {

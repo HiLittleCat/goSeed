@@ -6,15 +6,21 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-var Default Config
+// Default 配置项变量
+var (
+	Default Config //默认配置变量
+	UseEtcd bool   //是否通过etcd统一配置
+)
 
+// Config 配置项信息
 type Config struct {
 	Base    base
 	MongoDB mongodb
 	Redis   redis
+	Etcd    etcd
 }
 
-// 基础配置
+// base 基础配置
 type base struct {
 	Address      string
 	SlowRes      time.Duration
@@ -41,16 +47,22 @@ type redis struct {
 	SlowRes  time.Duration
 }
 
-// 创建一个Config对象
+// etcd 配置
+type etcd struct {
+	Endpoints   string
+	DialTimeout time.Duration
+}
+
+// New 创建一个Config对象
 func New(fileName string) error {
 	if _, err := toml.DecodeFile(fileName, &Default); err != nil {
 		return err
 	}
-	Default.Base.SlowRes = Default.Base.SlowRes * 1000 * 1000
-	Default.Base.WriteTimeout = Default.Base.WriteTimeout * 1000 * 1000
-	Default.Base.ReadTimeout = Default.Base.ReadTimeout * 1000 * 1000
-	Default.MongoDB.SlowRes = Default.MongoDB.SlowRes * 1000 * 1000
-	Default.Redis.SlowRes = Default.Redis.SlowRes * 1000 * 1000
-
+	Default.Base.SlowRes = Default.Base.SlowRes * time.Millisecond
+	Default.Base.WriteTimeout = Default.Base.WriteTimeout * time.Millisecond
+	Default.Base.ReadTimeout = Default.Base.ReadTimeout * time.Millisecond
+	Default.MongoDB.SlowRes = Default.MongoDB.SlowRes * time.Millisecond
+	Default.Redis.SlowRes = Default.Redis.SlowRes * time.Millisecond
+	InitEtcdConifg()
 	return nil
 }

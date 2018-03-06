@@ -10,8 +10,7 @@ import (
 )
 
 const (
-	URL   = "http://127.0.0.1:9000/User"
-	API_N = 1000
+	URL = "http://127.0.0.1:9000/User"
 )
 
 func TestCreate(t *testing.T) {

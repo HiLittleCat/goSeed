@@ -14,6 +14,7 @@ import (
 	redis "gopkg.in/redis.v5"
 )
 
+// Container  打印访问日志
 func Container(ctx *core.Context) {
 	start := time.Now()
 	ctx.Next()
@@ -23,7 +24,7 @@ func Container(ctx *core.Context) {
 	}
 }
 
-//set session info
+// Session session处理
 func Session(ctx *core.Context) {
 	redisPool := conn.GetRedisPool(conn.RedisBosh)
 	redisPool.Exec(conn.SessionDB, func(c *redis.Client) {

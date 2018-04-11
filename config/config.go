@@ -8,8 +8,8 @@ import (
 
 // Default 配置项变量
 var (
-	Default Config //默认配置变量
-	UseEtcd bool   //是否通过etcd统一配置
+	Default Config  //默认配置变量
+	UseEtcd = false //是否通过etcd统一配置
 )
 
 // Config 配置项信息

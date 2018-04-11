@@ -9,25 +9,15 @@ import (
 	"github.com/HiLittleCat/goSeed/config"
 	"github.com/HiLittleCat/goSeed/conn"
 	"github.com/HiLittleCat/goSeed/controller"
+	"github.com/HiLittleCat/goSeed/lib"
 	"github.com/HiLittleCat/goSeed/middleware"
-
 	logcore "github.com/HiLittleCat/log"
 	log "github.com/sirupsen/logrus"
 )
 
-func PathExists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return false, err
-}
-
 func main() {
-	//本函数将在调度程序优化后会去掉。
+
+	// 本函数将在调度程序优化后会去掉。
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// Parse config.ini
@@ -37,7 +27,7 @@ func main() {
 	}
 
 	// Log config
-	if b, _ := PathExists("log"); b == false {
+	if b, _ := lib.PathExists("log"); b == false {
 		os.Mkdir("log", 0777)
 	}
 	logFile, err := os.OpenFile("log/service.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0642)
@@ -83,12 +73,11 @@ func main() {
 	logcore.Use()
 	core.Use(middleware.Container)
 	compress.Use()
-	//core.Use(middleware.ResWrite)
+
 	core.Use(middleware.Session)
 
 	// Controller register
-	core.Use(core.AutoRouter)
-	core.AutoController(&controller.User{})
+	core.AddController(&controller.User{})
 
 	// Run server
 	core.Run()

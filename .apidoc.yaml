@@ -1,0 +1,9 @@
+version: 4.0.0+20171125
+inputs:
+    - lang: go
+      dir: ./controller
+      recursive: true
+output:
+    dir: ./doc
+    type: html
+    port: :9999

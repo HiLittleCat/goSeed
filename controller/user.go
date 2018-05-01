@@ -1,14 +1,27 @@
 package controller
 
 import (
-	"github.com/HiLittleCat/goSeed/model"
+	"github.com/HiLittleCat/goSeed/service"
 
 	"github.com/HiLittleCat/core"
+)
+
+var (
+	userService *service.User
 )
 
 // User controller
 type User struct {
 	core.Controller
+}
+
+// Register register routers of this controller
+func (u *User) Register() {
+	UserC := &User{}
+	rUser := core.Routers.Group("user")
+	rUser.POST("/create", UserC.Create)
+	rUser.GET("/page/:number/:count", UserC.GetPage)
+	rUser.GET("/get/:id", UserC.Get)
 }
 
 /**
@@ -21,51 +34,36 @@ type User struct {
 
  * @apiUse Res
  */
-func (u *User) PostCreate() (*model.User, error) {
-	mobile := u.ParamLength("mobile", 11)
-	name := u.ParamGet("name")
-	logo := u.ParamGet("logo")
-	user := &model.User{Mobile: mobile, Name: name, Logo: logo}
-	if err := user.Create(); err != nil {
-		return nil, err
-	}
-	return user, nil
+func (u *User) Create(ctx *core.Context) (interface{}, error) {
+	mobile := u.StrLength(ctx, "mobile", 11)
+	name := u.StrGet(ctx, "name")
+	logo := u.StrGet(ctx, "logo")
+	return userService.Create(mobile, name, logo)
 }
 
 /**
- * @api {get} /user/ 获取用户信息
+ * @api {get} /user/:id 获取用户信息
  * @apiGroup User
  *
- * @apiParam {String} _id 用户标识.
+ * @apiParam {String} :id 用户标识.
 
  * @apiUse Res
  */
-func (u *User) Get() (*model.User, error) {
-	_id := u.ParamLength("_id", 24)
-
-	user := &model.User{ID: _id}
-	if err := user.Get(); err != nil {
-		return nil, err
-	}
-	return user, nil
+func (u *User) Get(ctx *core.Context) (interface{}, error) {
+	_id := u.StrLength(ctx, "id", 1)
+	return userService.GetInfo(_id)
 }
 
 /**
- * @api {get} /user/page  按页获取用户列表
+ * @api {get} /user/page/:page  按页获取用户列表
  * @apiGroup User
  *
  * @apiParam {String} page 页码.
 
  * @apiUse Res
  */
-func (u *User) GetPage() (*model.UserList, error) {
-	page := u.ParamMin("page", 1)
-	pageCount := u.ParamRange("pageCount", 10, 20)
-
-	list := model.UserList{Page: page, PageCount: pageCount}
-	err := list.GetPage()
-	if err != nil {
-		return nil, err
-	}
-	return &list, nil
+func (u *User) GetPage(ctx *core.Context) (interface{}, error) {
+	page := u.IntRange(ctx, "number", 1, 100)
+	pageCount := u.IntRange(ctx, "count", 10, 20)
+	return userService.GetPage(page, pageCount)
 }

@@ -4,15 +4,19 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/HiLittleCat/goSeed/conn"
+	"github.com/HiLittleCat/goSeed/routers"
+
 	"github.com/HiLittleCat/compress"
 	"github.com/HiLittleCat/core"
+	logcore "github.com/HiLittleCat/log"
+
+	log "github.com/sirupsen/logrus"
+
 	"github.com/HiLittleCat/goSeed/config"
-	"github.com/HiLittleCat/goSeed/conn"
-	"github.com/HiLittleCat/goSeed/controller"
+	//"github.com/HiLittleCat/goSeed/conn"
 	"github.com/HiLittleCat/goSeed/lib"
 	"github.com/HiLittleCat/goSeed/middleware"
-	logcore "github.com/HiLittleCat/log"
-	log "github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -30,7 +34,7 @@ func main() {
 	if b, _ := lib.PathExists("log"); b == false {
 		os.Mkdir("log", 0777)
 	}
-	logFile, err := os.OpenFile("log/service.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0642)
+	logFile, _ := os.OpenFile("log/service.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0642)
 	defer logFile.Close()
 	log.SetOutput(logFile)
 	log.SetLevel(log.WarnLevel)
@@ -74,10 +78,10 @@ func main() {
 	core.Use(middleware.Container)
 	compress.Use()
 
-	core.Use(middleware.Session)
+	//core.Use(middleware.Session)
 
 	// Controller register
-	core.AddController(&controller.User{})
+	routers.Init()
 
 	// Run server
 	core.Run()

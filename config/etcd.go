@@ -16,9 +16,6 @@ type Receiver struct {
 var ConfigChan = make(chan *Receiver)
 
 func InitEtcdConifg() error {
-	if UseEtcd == false {
-		return nil
-	}
 	client, err := clientv3.New(clientv3.Config{
 		Endpoints: strings.Split(Default.Etcd.Endpoints, ","),
 	})

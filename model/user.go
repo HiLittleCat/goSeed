@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/HiLittleCat/core"
 	"github.com/HiLittleCat/goSeed/conn"
 
 	mgo "gopkg.in/mgo.v2"
@@ -9,9 +10,18 @@ import (
 
 var (
 	collectionName = "user"
+	dbName         = "mongodb." + conn.MgoBosh + "." + collectionName
 )
 
+func dbError(err error) error {
+	if err != nil {
+		return (&core.DBError{}).New(dbName, err.Error())
+	}
+	return nil
+}
+
 type User struct {
+	core.Model
 	ID     string `bson:"_id"`
 	Mobile string `bson:"mobile"`
 	Name   string `bson:"name"`
@@ -26,10 +36,10 @@ func (user *User) Create() (err error) {
 			"logo":   user.Logo,
 		})
 	})
-	return err
+	return dbError(err)
 }
 
-func (user *User) Get() (err error) {
+func (user *User) GetByID() (err error) {
 	conn.GetMgoPool(conn.MgoBosh).Exec(collectionName, func(c *mgo.Collection) {
 		err = c.Find(bson.M{
 			"_id": bson.ObjectIdHex(user.ID),
@@ -39,10 +49,20 @@ func (user *User) Get() (err error) {
 			"logo":   1,
 		}).One(user)
 	})
-	return err
+	return dbError(err)
+}
+
+func (user *User) GetCountByID() (count int, err error) {
+	conn.GetMgoPool(conn.MgoBosh).Exec(collectionName, func(c *mgo.Collection) {
+		count, err = c.Find(bson.M{
+			"_id": bson.ObjectIdHex(user.ID),
+		}).Count()
+	})
+	return count, dbError(err)
 }
 
 type UserList struct {
+	core.Model
 	Page      int
 	PageCount int
 	List      []User
@@ -56,5 +76,5 @@ func (list *UserList) GetPage() (err error) {
 			"logo":   1,
 		}).Skip((list.Page - 1) * list.PageCount).Limit(list.PageCount).All(&list.List)
 	})
-	return err
+	return dbError(err)
 }

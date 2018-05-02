@@ -34,11 +34,16 @@ func (u *User) Register() {
 
  * @apiUse Res
  */
-func (u *User) Create(ctx *core.Context) (interface{}, error) {
+func (u *User) Create(ctx *core.Context) {
 	mobile := u.StrLength(ctx, "mobile", 11)
 	name := u.StrGet(ctx, "name")
 	logo := u.StrGet(ctx, "logo")
-	return userService.Create(mobile, name, logo)
+	userModel, err := userService.Create(mobile, name, logo)
+	if err != nil {
+		ctx.Fail(err)
+	} else {
+		ctx.Ok(userModel)
+	}
 }
 
 /**
@@ -49,9 +54,14 @@ func (u *User) Create(ctx *core.Context) (interface{}, error) {
 
  * @apiUse Res
  */
-func (u *User) Get(ctx *core.Context) (interface{}, error) {
+func (u *User) Get(ctx *core.Context) {
 	_id := u.StrLength(ctx, "id", 1)
-	return userService.GetInfo(_id)
+	userModel, err := userService.GetInfo(_id)
+	if err != nil {
+		ctx.Fail(err)
+	} else {
+		ctx.Ok(userModel)
+	}
 }
 
 /**
@@ -62,8 +72,13 @@ func (u *User) Get(ctx *core.Context) (interface{}, error) {
 
  * @apiUse Res
  */
-func (u *User) GetPage(ctx *core.Context) (interface{}, error) {
+func (u *User) GetPage(ctx *core.Context) {
 	page := u.IntRange(ctx, "number", 1, 100)
 	pageCount := u.IntRange(ctx, "count", 10, 20)
-	return userService.GetPage(page, pageCount)
+	list, err := userService.GetPage(page, pageCount)
+	if err != nil {
+		ctx.Fail(err)
+	} else {
+		ctx.Ok(list)
+	}
 }

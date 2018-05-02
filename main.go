@@ -4,9 +4,6 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/HiLittleCat/goSeed/conn"
-	"github.com/HiLittleCat/goSeed/routers"
-
 	"github.com/HiLittleCat/compress"
 	"github.com/HiLittleCat/core"
 	logcore "github.com/HiLittleCat/log"
@@ -14,9 +11,10 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/HiLittleCat/goSeed/config"
-	//"github.com/HiLittleCat/goSeed/conn"
+	"github.com/HiLittleCat/goSeed/conn"
 	"github.com/HiLittleCat/goSeed/lib"
 	"github.com/HiLittleCat/goSeed/middleware"
+	_ "github.com/HiLittleCat/goSeed/routers"
 )
 
 func main() {
@@ -79,9 +77,6 @@ func main() {
 	compress.Use()
 
 	//core.Use(middleware.Session)
-
-	// Controller register
-	routers.Init()
 
 	// Run server
 	core.Run()

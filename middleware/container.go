@@ -28,11 +28,7 @@ func Container(ctx *core.Context) {
 func Session(ctx *core.Context) {
 	redisPool := conn.GetRedisPool(conn.RedisBosh)
 	redisPool.Exec(conn.SessionDB, func(c *redis.Client) {
-		// cmd := c.Get("session:")
-		// if err := cmd.Err(); err != nil {
-		// 	log.WithFields(log.Fields{"err": err}).Warn("get session fail")
-		// }
-		// cmd.Result()
+		// TODO
 	})
 	ctx.Next()
 }

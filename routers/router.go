@@ -5,6 +5,6 @@ import (
 )
 
 // Init routers init
-func Init() {
+func init() {
 	(&controller.User{}).Register()
 }

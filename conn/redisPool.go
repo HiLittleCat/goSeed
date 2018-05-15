@@ -3,7 +3,6 @@ package conn
 import (
 	"time"
 
-	"github.com/HiLittleCat/goSeed/config"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/redis.v5"
 )
@@ -18,10 +17,14 @@ type RedisPoolOption struct {
 	Host     string
 	Password string
 	DB       int
+	SlowRes  time.Duration
 }
 
 func NewRedisPool(opt RedisPoolOption) (*RedisPool, error) {
 	var p RedisPool
+	if opt.SlowRes == 0 {
+		opt.SlowRes = time.Millisecond * 100
+	}
 	err := p.init(opt)
 	return &p, err
 }
@@ -64,22 +67,23 @@ func (p *RedisPool) Get() Conn {
 func (p *RedisPool) Put(c Conn) {
 	p.p.m.Lock()
 	defer p.p.m.Unlock()
+	c.(*redis.Client).Close()
 	p.p.c <- struct{}{}
 }
 
 // 使用连接池
-func (self *RedisPool) Exec(db int8, callback func(*redis.Client)) {
+func (p *RedisPool) Exec(callback func(*redis.Client)) {
 	start := time.Now()
-	client := self.Get().(*redis.Client)
+	client := p.Get().(*redis.Client)
 	defer func() {
-		self.Put(client)
+		p.Put(client)
 		if err := recover(); err != nil {
 			log.Errorln("redis exec err, ", err)
 			panic(err)
 		}
 		t := time.Since(start)
-		if t >= config.Default.Redis.SlowRes {
-			log.Warnln("redis exec db:", db, t)
+		if t >= p.opt.SlowRes && p.opt.SlowRes != 0 {
+			log.Warnln("redis exec db:", p.opt.DB, t)
 		}
 	}()
 	callback(client)

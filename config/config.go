@@ -2,20 +2,22 @@ package config
 
 import (
 	"time"
+
 	"github.com/BurntSushi/toml"
 )
 
 // Default 配置项变量
 var (
-	Default Config  //默认配置变量
+	Default Config //默认配置变量
 )
 
 // Config 配置项信息
 type Config struct {
-	Base    base
-	MongoDB mongodb
-	Redis   redis
-	Etcd    etcd
+	Base         base
+	MongoDB      mongodb
+	RedisBase    redisBase
+	RedisSession redisSession
+	Etcd         etcd
 }
 
 // base 基础配置
@@ -38,16 +40,28 @@ type mongodb struct {
 }
 
 // redis 配置
-type redis struct {
+type redisBase struct {
 	Host     string
 	Password string
 	PoolSize int
+	DB       int
 	SlowRes  time.Duration
+	Name     string
+}
+
+// redis 配置
+type redisSession struct {
+	Host     string
+	Password string
+	PoolSize int
+	DB       int
+	SlowRes  time.Duration
+	Name     string
 }
 
 // etcd 配置
 type etcd struct {
-	UseEtcd 	bool
+	UseEtcd     bool
 	Endpoints   string
 	DialTimeout time.Duration
 }
@@ -61,7 +75,8 @@ func New(fileName string) error {
 	Default.Base.WriteTimeout = Default.Base.WriteTimeout * time.Millisecond
 	Default.Base.ReadTimeout = Default.Base.ReadTimeout * time.Millisecond
 	Default.MongoDB.SlowRes = Default.MongoDB.SlowRes * time.Millisecond
-	Default.Redis.SlowRes = Default.Redis.SlowRes * time.Millisecond
+	Default.RedisBase.SlowRes = Default.RedisBase.SlowRes * time.Millisecond
+	Default.RedisSession.SlowRes = Default.RedisSession.SlowRes * time.Millisecond
 	if Default.Etcd.UseEtcd == false {
 		return nil
 	}

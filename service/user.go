@@ -18,7 +18,7 @@ func (u *User) Create(mobile string, name string, logo string) (*model.User, err
 	//检查用户是否存在
 	count, err := userModel.GetCountByID()
 	if count > 0 {
-		return nil, errors.ERR_USER_EXIST
+		return nil, errors.ErrUserExist
 	} else if err != nil {
 		return nil, err
 	}

@@ -18,6 +18,7 @@ type Config struct {
 	RedisBase    redisBase
 	RedisSession redisSession
 	Etcd         etcd
+	Session      session
 }
 
 // base 基础配置
@@ -66,6 +67,15 @@ type etcd struct {
 	DialTimeout time.Duration
 }
 
+// session 配置
+type session struct {
+	Name     string
+	Expire   time.Duration
+	Secure   bool
+	HttpOnly bool
+	Domain   string
+}
+
 // New 创建一个Config对象
 func New(fileName string) error {
 	if _, err := toml.DecodeFile(fileName, &Default); err != nil {
@@ -77,6 +87,7 @@ func New(fileName string) error {
 	Default.MongoDB.SlowRes = Default.MongoDB.SlowRes * time.Millisecond
 	Default.RedisBase.SlowRes = Default.RedisBase.SlowRes * time.Millisecond
 	Default.RedisSession.SlowRes = Default.RedisSession.SlowRes * time.Millisecond
+	Default.Session.Expire = Default.RedisSession.SlowRes * time.Second
 	if Default.Etcd.UseEtcd == false {
 		return nil
 	}

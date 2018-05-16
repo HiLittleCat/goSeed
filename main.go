@@ -1,17 +1,19 @@
 package main
 
 import (
+	"net/http"
 	"os"
 	"runtime"
 
 	"github.com/HiLittleCat/compress"
+	"github.com/HiLittleCat/conn"
 	"github.com/HiLittleCat/core"
 	logcore "github.com/HiLittleCat/log"
+	"github.com/HiLittleCat/session"
 
 	log "github.com/sirupsen/logrus"
 
 	"github.com/HiLittleCat/goSeed/config"
-	"github.com/HiLittleCat/goSeed/conn"
 	"github.com/HiLittleCat/goSeed/lib"
 	"github.com/HiLittleCat/goSeed/middleware"
 	_ "github.com/HiLittleCat/goSeed/routers"
@@ -49,7 +51,7 @@ func main() {
 		log.WithFields(log.Fields{"err": err}).Fatalln("connect mongodb: " + config.Default.MongoDB.DatebaseName + "  fail")
 		os.Exit(1)
 	}
-	conn.MgoSet(conn.MgoBosh, mgoPool)
+	conn.MgoSet(mgoOption.DbName, mgoPool)
 
 	// RedisBase init
 	redisOption := conn.RedisPoolOption{
@@ -61,7 +63,7 @@ func main() {
 	}
 	redisPool, err := conn.NewRedisPool(redisOption)
 	if err != nil {
-		log.WithFields(log.Fields{"err": err}).Fatalln("connect redis:" + config.Default.Redis.Host + " fail")
+		log.WithFields(log.Fields{"err": err}).Fatalln("connect RedisBase:" + config.Default.RedisBase.Host + " fail")
 		os.Exit(1)
 	}
 	conn.RedisSet(config.Default.RedisBase.Name, redisPool)
@@ -76,7 +78,7 @@ func main() {
 	}
 	redisSessionPool, err := conn.NewRedisPool(redisSessionOption)
 	if err != nil {
-		log.WithFields(log.Fields{"err": err}).Fatalln("connect redis:" + config.Default.Redis.Host + " fail")
+		log.WithFields(log.Fields{"err": err}).Fatalln("connect RedisSession:" + config.Default.RedisSession.Host + " fail")
 		os.Exit(1)
 	}
 	conn.RedisSet(config.Default.RedisSession.Name, redisSessionPool)
@@ -91,9 +93,18 @@ func main() {
 	// Middleware register
 	logcore.Use()
 	core.Use(middleware.Container)
+	session.Use(&session.Store{
+		Expire:    config.Default.Session.Expire,
+		RedisPool: redisSessionPool,
+		Cookie: &http.Cookie{
+			Name:     "",
+			MaxAge:   int(config.Default.Session.Expire.Seconds()),
+			HttpOnly: config.Default.Session.HttpOnly,
+			Domain:   config.Default.Session.Domain,
+			Secure:   config.Default.Session.Secure,
+		},
+	})
 	compress.Use()
-
-	//core.Use(middleware.Session)
 
 	// Run server
 	core.Run()

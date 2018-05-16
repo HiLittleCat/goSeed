@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"github.com/HiLittleCat/goSeed/service"
-
 	"github.com/HiLittleCat/core"
+	"github.com/HiLittleCat/goSeed/errors"
+	"github.com/HiLittleCat/goSeed/service"
 )
 
 var (
@@ -55,6 +55,11 @@ func (u *User) Create(ctx *core.Context) {
  * @apiUse Res
  */
 func (u *User) Get(ctx *core.Context) {
+	session := ctx.Data["session"]
+	if session == nil {
+		ctx.Fail(errors.ErrUserExist)
+		return
+	}
 	_id := u.StrLength(ctx, "id", 1)
 	userModel, err := userService.GetInfo(_id)
 	if err != nil {

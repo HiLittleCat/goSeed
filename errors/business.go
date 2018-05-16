@@ -5,4 +5,5 @@ import (
 )
 
 var businessErr = &core.BusinessError{}
-var ERR_USER_EXIST = businessErr.New(10000, "user has exist")
+var ErrUserExist = businessErr.New(10000, "user has exist")
+var ErrNeedLogin = businessErr.New(10001, "need login")

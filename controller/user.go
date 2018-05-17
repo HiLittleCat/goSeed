@@ -66,11 +66,10 @@ func (u *User) Get(ctx *core.Context) {
 }
 
 /**
- * @api {get} /user/page/:page  按页获取用户列表
+ * @api {get} /user/page/:number/:count  按页获取用户列表
  * @apiGroup User
- *
- * @apiParam {String} page 页码.
-
+ * @apiParam {String} :number 页码.
+ * @apiParam {String} :count 每页数据条数.
  * @apiUse Res
  */
 func (u *User) GetPage(ctx *core.Context) {

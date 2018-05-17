@@ -19,7 +19,7 @@ type User struct {
 }
 
 func (user *User) Create() (err error) {
-	conn.GetMgoPool(config.Default.MongoDB.DatebaseName).Exec(collectionName, func(c *mgo.Collection) {
+	conn.GetMgoPool(config.Default.MongoDB.Name).Exec(collectionName, func(c *mgo.Collection) {
 		err = c.Insert(bson.M{
 			"mobile": user.Mobile,
 			"name":   user.Name,
@@ -30,7 +30,7 @@ func (user *User) Create() (err error) {
 }
 
 func (user *User) GetByID() (err error) {
-	conn.GetMgoPool(config.Default.MongoDB.DatebaseName).Exec(collectionName, func(c *mgo.Collection) {
+	conn.GetMgoPool(config.Default.MongoDB.Name).Exec(collectionName, func(c *mgo.Collection) {
 		err = c.Find(bson.M{
 			"_id": bson.ObjectIdHex(user.ID),
 		}).Select(bson.M{
@@ -43,7 +43,7 @@ func (user *User) GetByID() (err error) {
 }
 
 func (user *User) GetCountByID() (count int, err error) {
-	conn.GetMgoPool(config.Default.MongoDB.DatebaseName).Exec(collectionName, func(c *mgo.Collection) {
+	conn.GetMgoPool(config.Default.MongoDB.Name).Exec(collectionName, func(c *mgo.Collection) {
 		count, err = c.Find(bson.M{
 			"_id": bson.ObjectIdHex(user.ID),
 		}).Count()
@@ -58,7 +58,7 @@ type UserList struct {
 }
 
 func (list *UserList) GetPage() (err error) {
-	conn.GetMgoPool(config.Default.MongoDB.DatebaseName).Exec(collectionName, func(c *mgo.Collection) {
+	conn.GetMgoPool(config.Default.MongoDB.Name).Exec(collectionName, func(c *mgo.Collection) {
 		err = c.Find(nil).Select(bson.M{
 			"mobile": 1,
 			"name":   1,

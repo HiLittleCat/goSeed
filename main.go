@@ -46,11 +46,11 @@ func main() {
 	mgoOption := conn.MgoPoolOption{
 		Host:   config.Default.MongoDB.Host,
 		Size:   config.Default.MongoDB.PoolSize,
-		DbName: config.Default.MongoDB.DatebaseName,
+		DbName: config.Default.MongoDB.Name,
 	}
 	mgoPool, err := conn.NewMgoPool(mgoOption)
 	if err != nil {
-		log.WithFields(log.Fields{"err": err}).Fatalln("connect mongodb: " + config.Default.MongoDB.DatebaseName + "  fail")
+		log.WithFields(log.Fields{"err": err}).Fatalln("connect mongodb: " + config.Default.MongoDB.Name + "  fail")
 		os.Exit(1)
 	}
 	conn.MgoSet(mgoOption.DbName, mgoPool)

@@ -33,11 +33,11 @@ type base struct {
 
 // MongoDB 配置
 type mongodb struct {
-	Host         string
-	Password     string
-	DatebaseName string
-	PoolSize     int
-	SlowRes      time.Duration
+	Host     string
+	Password string
+	Name     string
+	PoolSize int
+	SlowRes  time.Duration
 }
 
 // redis 配置

@@ -87,7 +87,7 @@ func New(fileName string) error {
 	Default.MongoDB.SlowRes = Default.MongoDB.SlowRes * time.Millisecond
 	Default.RedisBase.SlowRes = Default.RedisBase.SlowRes * time.Millisecond
 	Default.RedisSession.SlowRes = Default.RedisSession.SlowRes * time.Millisecond
-	Default.Session.Expire = Default.RedisSession.SlowRes * time.Second
+	Default.Session.Expire = Default.Session.Expire * time.Second
 	if Default.Etcd.UseEtcd == false {
 		return nil
 	}

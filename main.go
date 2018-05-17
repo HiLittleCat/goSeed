@@ -38,7 +38,9 @@ func main() {
 	defer logFile.Close()
 	log.SetOutput(logFile)
 	log.SetLevel(log.WarnLevel)
-	log.SetFormatter(&log.JSONFormatter{})
+	log.SetFormatter(&log.TextFormatter{
+		TimestampFormat: "2006-01-02 15:00:00",
+	})
 
 	// Mongodb init
 	mgoOption := conn.MgoPoolOption{
@@ -93,17 +95,18 @@ func main() {
 	// Middleware register
 	logcore.Use()
 	core.Use(middleware.Container)
-	session.Use(&session.Store{
-		Expire:    config.Default.Session.Expire,
-		RedisPool: redisSessionPool,
-		Cookie: &http.Cookie{
-			Name:     "",
-			MaxAge:   int(config.Default.Session.Expire.Seconds()),
+
+	session.Use(session.StoreOption{
+		Expire: config.Default.Session.Expire,
+		Pool:   redisSessionPool,
+		Cookie: http.Cookie{
+			Name:     config.Default.Session.Name,
 			HttpOnly: config.Default.Session.HttpOnly,
 			Domain:   config.Default.Session.Domain,
 			Secure:   config.Default.Session.Secure,
 		},
 	})
+
 	compress.Use()
 
 	// Run server

@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/HiLittleCat/core"
-	"github.com/HiLittleCat/goSeed/errors"
+	"github.com/HiLittleCat/goSeed/middleware"
 	"github.com/HiLittleCat/goSeed/service"
 )
 
@@ -18,10 +18,10 @@ type User struct {
 // Register register routers of this controller
 func (u *User) Register() {
 	UserC := &User{}
-	rUser := core.Routers.Group("user")
-	rUser.POST("/create", UserC.Create)
-	rUser.GET("/page/:number/:count", UserC.GetPage)
-	rUser.GET("/get/:id", UserC.Get)
+	group := core.Routers.Group("user")
+	group.POST("/create", UserC.Create)
+	group.GET("/page/:number/:count", UserC.GetPage)
+	group.GET("/get/:id", middleware.RequireSession, UserC.Get)
 }
 
 /**
@@ -55,12 +55,8 @@ func (u *User) Create(ctx *core.Context) {
  * @apiUse Res
  */
 func (u *User) Get(ctx *core.Context) {
-	session := ctx.Data["session"]
-	if session == nil {
-		ctx.Fail(errors.ErrUserExist)
-		return
-	}
-	_id := u.StrLength(ctx, "id", 1)
+	_id := u.StrLength(ctx, "id", 24)
+
 	userModel, err := userService.GetInfo(_id)
 	if err != nil {
 		ctx.Fail(err)
@@ -87,3 +83,9 @@ func (u *User) GetPage(ctx *core.Context) {
 		ctx.Ok(list)
 	}
 }
+
+// login
+// st := (&session.Store{}).Generate(_id, map[string]string{"uid": _id, "name": "xuyunfeng"})
+// st.Flush()
+// st.Cookie.Value = _id
+// http.SetCookie(ctx.ResponseWriter, &st.Cookie)

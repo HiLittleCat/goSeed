@@ -4,6 +4,7 @@ import (
 	"github.com/HiLittleCat/core"
 	"github.com/HiLittleCat/goSeed/errors"
 	"github.com/HiLittleCat/goSeed/model"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // User service
@@ -31,7 +32,7 @@ func (u *User) Create(mobile string, name string, logo string) (*model.User, err
 
 //GetInfo  获取用户信息
 func (u *User) GetInfo(_id string) (*model.User, error) {
-	userModel := &model.User{ID: _id}
+	userModel := &model.User{ID: bson.ObjectIdHex(_id)}
 	err := userModel.GetByID()
 	return userModel, err
 }

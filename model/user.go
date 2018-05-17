@@ -12,10 +12,10 @@ const (
 )
 
 type User struct {
-	ID     string `bson:"_id"`
-	Mobile string `bson:"mobile"`
-	Name   string `bson:"name"`
-	Logo   string `bson:"logo"`
+	ID     bson.ObjectId `bson:"_id"`
+	Mobile string        `bson:"mobile"`
+	Name   string        `bson:"name"`
+	Logo   string        `bson:"logo"`
 }
 
 func (user *User) Create() (err error) {
@@ -32,7 +32,7 @@ func (user *User) Create() (err error) {
 func (user *User) GetByID() (err error) {
 	conn.GetMgoPool(config.Default.MongoDB.Name).Exec(collectionName, func(c *mgo.Collection) {
 		err = c.Find(bson.M{
-			"_id": bson.ObjectIdHex(user.ID),
+			"_id": user.ID,
 		}).Select(bson.M{
 			"mobile": 1,
 			"name":   1,
@@ -45,7 +45,7 @@ func (user *User) GetByID() (err error) {
 func (user *User) GetCountByID() (count int, err error) {
 	conn.GetMgoPool(config.Default.MongoDB.Name).Exec(collectionName, func(c *mgo.Collection) {
 		count, err = c.Find(bson.M{
-			"_id": bson.ObjectIdHex(user.ID),
+			"_id": user.ID,
 		}).Count()
 	})
 	return count, err

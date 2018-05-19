@@ -39,7 +39,7 @@ func main() {
 	log.SetOutput(logFile)
 	log.SetLevel(log.WarnLevel)
 	log.SetFormatter(&log.TextFormatter{
-		TimestampFormat: "2006-01-02 15:00:00",
+		TimestampFormat: "2006-01-02 15:10:10",
 	})
 
 	// Mongodb init
@@ -96,7 +96,7 @@ func main() {
 	logcore.Use()
 	core.Use(middleware.Container)
 
-	session.Use(session.StoreOption{
+	session.Use(&session.RedisProvider{
 		Expire: config.Default.Session.Expire,
 		Pool:   redisSessionPool,
 		Cookie: http.Cookie{

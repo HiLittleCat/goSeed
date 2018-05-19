@@ -41,9 +41,9 @@ func (u *User) Create(ctx *core.Context) {
 	userModel, err := userService.Create(mobile, name, logo)
 	if err != nil {
 		ctx.Fail(err)
-	} else {
-		ctx.Ok(userModel)
+		return
 	}
+	ctx.Ok(userModel)
 }
 
 /**
@@ -82,9 +82,3 @@ func (u *User) GetPage(ctx *core.Context) {
 		ctx.Ok(list)
 	}
 }
-
-// login
-// st := (&session.Store{}).Generate(_id, map[string]string{"uid": _id, "name": "xuyunfeng"})
-// st.Flush()
-// st.Cookie.Value = _id
-// http.SetCookie(ctx.ResponseWriter, &st.Cookie)

@@ -96,16 +96,16 @@ func main() {
 	logcore.Use()
 	core.Use(middleware.Container)
 
-	session.Use(&session.RedisProvider{
-		Expire: config.Default.Session.Expire,
-		Pool:   redisSessionPool,
-		Cookie: http.Cookie{
+	session.Use(
+		config.Default.Session.Expire,
+		redisSessionPool,
+		http.Cookie{
 			Name:     config.Default.Session.Name,
 			HttpOnly: config.Default.Session.HttpOnly,
 			Domain:   config.Default.Session.Domain,
 			Secure:   config.Default.Session.Secure,
 		},
-	})
+	)
 
 	compress.Use()
 

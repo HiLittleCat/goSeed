@@ -56,7 +56,6 @@ func (u *User) Create(ctx *core.Context) {
  */
 func (u *User) Get(ctx *core.Context) {
 	_id := u.StrLength(ctx, "id", 24)
-
 	userModel, err := userService.GetInfo(_id)
 	if err != nil {
 		ctx.Fail(err)

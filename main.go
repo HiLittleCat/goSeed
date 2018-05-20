@@ -9,7 +9,6 @@ import (
 	"github.com/HiLittleCat/conn"
 	"github.com/HiLittleCat/core"
 	logcore "github.com/HiLittleCat/log"
-	"github.com/HiLittleCat/session"
 
 	log "github.com/sirupsen/logrus"
 
@@ -96,7 +95,7 @@ func main() {
 	logcore.Use()
 	core.Use(middleware.Container)
 
-	session.Use(
+	core.SessionInit(
 		config.Default.Session.Expire,
 		redisSessionPool,
 		http.Cookie{

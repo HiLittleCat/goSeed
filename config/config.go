@@ -13,12 +13,11 @@ var (
 
 // Config 配置项信息
 type Config struct {
-	Base         base
-	MongoDB      mongodb
-	RedisBase    redisBase
-	RedisSession redisSession
-	Etcd         etcd
-	Session      session
+	Base      base
+	MongoDB   mongodb
+	RedisBase redisBase
+	Etcd      etcd
+	Session   session
 }
 
 // base 基础配置
@@ -42,16 +41,6 @@ type mongodb struct {
 
 // redis 配置
 type redisBase struct {
-	Host     string
-	Password string
-	PoolSize int
-	DB       int
-	SlowRes  time.Duration
-	Name     string
-}
-
-// redis 配置
-type redisSession struct {
 	Host     string
 	Password string
 	PoolSize int
@@ -86,7 +75,6 @@ func New(fileName string) error {
 	Default.Base.ReadTimeout = Default.Base.ReadTimeout * time.Millisecond
 	Default.MongoDB.SlowRes = Default.MongoDB.SlowRes * time.Millisecond
 	Default.RedisBase.SlowRes = Default.RedisBase.SlowRes * time.Millisecond
-	Default.RedisSession.SlowRes = Default.RedisSession.SlowRes * time.Millisecond
 	Default.Session.Expire = Default.Session.Expire * time.Second
 	if Default.Etcd.UseEtcd == false {
 		return nil

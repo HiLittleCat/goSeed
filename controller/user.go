@@ -2,7 +2,6 @@ package controller
 
 import (
 	"github.com/HiLittleCat/core"
-	"github.com/HiLittleCat/goSeed/middleware"
 	"github.com/HiLittleCat/goSeed/service"
 )
 
@@ -20,8 +19,6 @@ func (u *User) Register() {
 	UserC := &User{}
 	group := core.Routers.Group("user")
 	group.POST("/create", UserC.Create)
-	group.GET("/page/:number/:count", UserC.GetPage)
-	group.GET("/get/:id", middleware.RequireSession, UserC.Get)
 }
 
 /**
@@ -35,49 +32,13 @@ func (u *User) Register() {
  * @apiUse Res
  */
 func (u *User) Create(ctx *core.Context) {
-	mobile := u.StrLength(ctx, "mobile", 11)
-	name := u.StrGet(ctx, "name")
-	logo := u.StrGet(ctx, "logo")
+	mobile := u.StrLength("手机号码", "mobile", 11)
+	name := u.StrLenRange("名字", "name", 2, 6)
+	logo := u.StrLenRange("头像url", "logo", 0, 50)
 	userModel, err := userService.Create(mobile, name, logo)
 	if err != nil {
 		ctx.Fail(err)
 		return
 	}
 	ctx.Ok(userModel)
-}
-
-/**
- * @api {get} /user/:id 获取用户信息
- * @apiGroup User
- *
- * @apiParam {String} :id 用户标识.
-
- * @apiUse Res
- */
-func (u *User) Get(ctx *core.Context) {
-	_id := u.StrLength(ctx, "id", 24)
-	userModel, err := userService.GetInfo(_id)
-	if err != nil {
-		ctx.Fail(err)
-	} else {
-		ctx.Ok(userModel)
-	}
-}
-
-/**
- * @api {get} /user/page/:number/:count  按页获取用户列表
- * @apiGroup User
- * @apiParam {String} :number 页码.
- * @apiParam {String} :count 每页数据条数.
- * @apiUse Res
- */
-func (u *User) GetPage(ctx *core.Context) {
-	page := u.IntRange(ctx, "number", 1, 100)
-	pageCount := u.IntRange(ctx, "count", 10, 20)
-	list, err := userService.GetPage(page, pageCount)
-	if err != nil {
-		ctx.Fail(err)
-	} else {
-		ctx.Ok(list)
-	}
 }

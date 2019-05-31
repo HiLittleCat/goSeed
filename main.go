@@ -37,8 +37,8 @@ func main() {
 	defer logFile.Close()
 	log.SetOutput(logFile)
 	log.SetLevel(log.WarnLevel)
-	log.SetFormatter(&log.TextFormatter{
-		TimestampFormat: "2006-01-02 15:10:10",
+	log.SetFormatter(&log.JSONFormatter{
+		TimestampFormat: "2006-01-02 15:04:05",
 	})
 
 	// Mongodb init
@@ -54,20 +54,33 @@ func main() {
 	}
 	conn.MgoSet(mgoOption.DbName, mgoPool)
 
-	// RedisBase init
+	// MongodbStatistics init
+	mgoStatisticsOption := conn.MgoPoolOption{
+		Host:   config.Default.MongodbStatistics.Host,
+		Size:   config.Default.MongodbStatistics.PoolSize,
+		DbName: config.Default.MongodbStatistics.Name,
+	}
+	mgoStatisticsPool, err := conn.NewMgoPool(mgoStatisticsOption)
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Fatalln("connect mongodb: " + config.Default.MongoDB.Name + "  fail")
+		os.Exit(1)
+	}
+	conn.MgoSet(mgoStatisticsOption.DbName, mgoStatisticsPool)
+
+	// RedisCache init
 	redisOption := conn.RedisPoolOption{
-		Host:     config.Default.RedisBase.Host,
-		Password: config.Default.RedisBase.Password,
-		Size:     config.Default.RedisBase.PoolSize,
-		DB:       config.Default.RedisBase.DB,
-		SlowRes:  config.Default.RedisBase.SlowRes,
+		Host:     config.Default.RedisCache.Host,
+		Password: config.Default.RedisCache.Password,
+		Size:     config.Default.RedisCache.PoolSize,
+		DB:       config.Default.RedisCache.DB,
+		SlowRes:  config.Default.RedisCache.SlowRes,
 	}
 	redisPool, err := conn.NewRedisPool(redisOption)
 	if err != nil {
-		log.WithFields(log.Fields{"err": err}).Fatalln("connect RedisBase:" + config.Default.RedisBase.Host + " fail")
+		log.WithFields(log.Fields{"err": err}).Fatalln("connect RedisCache:" + config.Default.RedisCache.Host + " fail")
 		os.Exit(1)
 	}
-	conn.RedisSet(config.Default.RedisBase.Name, redisPool)
+	conn.RedisSet(config.Default.RedisCache.Name, redisPool)
 
 	// RedisSession init
 	redisSessionOption := conn.RedisPoolOption{
@@ -83,6 +96,21 @@ func main() {
 		os.Exit(1)
 	}
 	conn.RedisSet(config.Default.RedisSession.Name, redisSessionPool)
+
+	// RedisSafe init
+	redisSafeOption := conn.RedisPoolOption{
+		Host:     config.Default.RedisSafe.Host,
+		Password: config.Default.RedisSafe.Password,
+		Size:     config.Default.RedisSafe.PoolSize,
+		DB:       config.Default.RedisSafe.DB,
+		SlowRes:  config.Default.RedisSafe.SlowRes,
+	}
+	redisSafePool, err := conn.NewRedisPool(redisSafeOption)
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Fatalln("connect RedisSession:" + config.Default.RedisSession.Host + " fail")
+		os.Exit(1)
+	}
+	conn.RedisSet(config.Default.RedisSafe.Name, redisSafePool)
 
 	// Core set
 	core.Address = config.Default.Base.Address
@@ -103,6 +131,7 @@ func main() {
 			HttpOnly: config.Default.Session.HttpOnly,
 			Domain:   config.Default.Session.Domain,
 			Secure:   config.Default.Session.Secure,
+			Path:     "/",
 		},
 	)
 

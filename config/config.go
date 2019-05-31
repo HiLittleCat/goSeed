@@ -79,5 +79,5 @@ func New(fileName string) error {
 	if Default.Etcd.UseEtcd == false {
 		return nil
 	}
-	return InitEtcdConifg()
+	return InitConifgFromEtcd()
 }
